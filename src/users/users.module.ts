@@ -1,0 +1,12 @@
+// src/flight-booking/flight-booking.module.ts
+import { Module } from '@nestjs/common';
+import { UsersService} from './users.service';
+import { UsersController } from './users.controller';
+
+@Module({
+  imports: [],
+  controllers: [UsersController],
+  providers: [UsersService],
+  exports: [UsersService], // Ensure the service is exported
+})
+export class UsersModule { }
