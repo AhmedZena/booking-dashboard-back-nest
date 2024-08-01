@@ -60,11 +60,17 @@ export class CombinedBookingService {
           hotelBookings.totalSales +
           transferBookings.totalSales,
 
+        busBookingsTotalSales:  busBookings.totalSales,
+        busBookingsTotalBookings: busBookings.totalBookings,
+        flightBookingsTotalSales: flightBookings.totalSales,
+        flightBookingsTotalBookings: flightBookings.totalBookings,
+        hotelBookingsTotalSales: hotelBookings.totalSales,
+        hotelBookingsTotalBookings: hotelBookings.totalBookings,
+        transferBookingsTotalSales: transferBookings.totalSales,
+        transferBookingsTotalBookings: transferBookings.totalBookings,
+
         results: allResults, // Return the merged results array
-        busResults: busBookings.results,
-        flightResults: flightBookings.results,
-        hotelResults: hotelBookings.results,
-        transferResults: transferBookings.results,
+   
       };
     } catch (error) {
       throw new Error(`Failed to fetch bookings: ${error.message}`);
