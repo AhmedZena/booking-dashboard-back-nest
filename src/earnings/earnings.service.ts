@@ -35,7 +35,7 @@ export class EarningsService {
             numberOfSalesDone,
             totalAmount,
             totalCapturedAmountDone: totalCapturedAmount,
-            earningsCaptured: results,
+            earningsCaptured: capturedEarnings,
           });
         }
       );
