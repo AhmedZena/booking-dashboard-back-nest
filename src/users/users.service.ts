@@ -46,4 +46,20 @@ export class UsersService {
       );
     });
   }
+
+  // get user by id
+  async getUserById(userId: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.dbConnection.query(
+        `SELECT * FROM users WHERE id=${userId}`,
+        (error, results) => {
+          if (error) {
+            reject(error);
+          }
+
+          resolve(results[0]);
+        },
+      );
+    });
+  }
 }

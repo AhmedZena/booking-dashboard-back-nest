@@ -38,4 +38,9 @@ export interface IFlightBooking {
   refundId: number;
   firstCreated: Date;
   lastModified: Date;
+  user: {
+    name: string;
+    phone: string;
+    email: string;
+  };
 }

@@ -1,31 +1,53 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Connection } from 'mysql2/promise';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class BusBookingService {
-  constructor(@Inject('DATABASE_CONNECTION') private readonly dbConnection: Connection) { }
+  constructor(
+    @Inject('DATABASE_CONNECTION')
+    private readonly dbConnection: Connection,
+    private readonly usersService: UsersService
+  ) { }
 
   async getBookingsByDay(day: string): Promise<any> {
+    const users = await this.usersService.getAllUsers();
     console.log('day', day); // day 2021-08-01
+
     return new Promise((resolve, reject) => {
-      this.dbConnection.query(`SELECT * FROM bus_booking WHERE departureTime LIKE '${day}%'`, (error, results) => {
-        if (error) {
-          reject(error);
-        }
-        const totalSales = results.reduce(
-          (accumulator, currentValue) => accumulator + +currentValue.price,
-          0,
-        );
-        console.log(totalSales)
+      this.dbConnection.query(
+        `SELECT * FROM bus_booking WHERE departureTime LIKE '${day}%'`,
+        async (error, results) => {
+          if (error) {
+            return reject(error);
+          }
 
+          const totalSales = results.reduce(
+            (accumulator, currentValue) => accumulator + +currentValue.price,
+            0,
+          );
 
+          // Use Promise.all to wait for all user fetching operations to complete
+          const enrichedResults = await Promise.all(
+            results.map(async (result) => {
+              const user = await this.usersService.getUserById(+result.userId);
+              console.log('user', user);
+              result.user =  {
+                name: user?.firstName + ' ' + user?.lastName,
+                phone: user?.phone,
+                email: user?.email,
+              }
+              return result;
+            }),
+          );
 
-        resolve({
-          totalBookings: results?.length || 0,
-          totalSales: Math.round(totalSales),
-          results
-        });
-      });
+          resolve({
+            totalBookings: enrichedResults?.length || 0,
+            totalSales: Math.round(totalSales),
+            results: enrichedResults,
+          });
+        },
+      );
     });
   }
 
@@ -38,7 +60,10 @@ export class BusBookingService {
             reject(error);
           }
 
-          const totalSales = results.reduce((accumulator, currentValue) => accumulator + +currentValue.price, 0);
+          const totalSales = results.reduce(
+            (accumulator, currentValue) => accumulator + +currentValue.price,
+            0,
+          );
 
           resolve({
             totalBookings: results?.length || 0,
